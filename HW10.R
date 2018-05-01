@@ -10,7 +10,7 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       selectInput("State", "State",  choices = state.abb),
-      radioButtons("Plot", "Plot",
+      radioButtons("Type", "Type",
                    choices = list("MedianHouseholdIncome", "MedianGrossRent", "Ratio"))),
     mainPanel(
       plotOutput("Plot")
@@ -20,11 +20,11 @@ ui <- fluidPage(
   # title
 )
 server <- function(input, output){
- 
+  
   reduced_df <- reactive({
     get_acs(
       geography = "tract",
-      variables = c(MedianHouseholdIncome = "B19013_001", MedianGrossRent = "B25064_001"),
+      variable = c(MedianHouseholdIncome = "B19013_001", MedianGrossRent = "B25064_001"),
       state = input$State,
       geometry = TRUE
     ) %>%
@@ -36,7 +36,7 @@ server <- function(input, output){
   
   output$Plot <- renderPlot({
     reduced_df() %>%
-      ggplot(aes_string(fill = input$Plot)) + scale_fill_gradientn(colours = rainbow(7))
+      ggplot(aes_string(fill = input$Type)) + geom_sf() + scale_fill_gradientn(colours = rainbow(7))
   })
 }
 shinyApp(ui = ui, server = server)
